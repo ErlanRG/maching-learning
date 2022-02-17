@@ -20,10 +20,21 @@ We can use the linear equation to model these kind of regressions:
 y = mX+b
 ```
 
+### Assumptions of a linear regression
+
+Before building a linear regression model, we need to check if the following
+assumtions are true:
+
+- Linearity
+- Homoscedasticity
+- Multivariate normality
+- Independence of errors
+- Lack of multicollinearity
+
 ## Multiple linear regression
 
-The multiple linear regression examine the variation between more than two variables.
-Can be represented by the following equation:
+The multiple linear regression examine the variation between more than two
+variables. Can be represented by the following equation:
 
 ```
 y = b0+m1*x1+m2*x2+...+mn*xn
@@ -37,6 +48,20 @@ variable X and the dependent variable Y with the following equation:
 ```
 y = b0+b1*x+b2*x^2+...+bn*x^n
 ```
+
+# Dummy variables
+
+Sometimes, we will face information that does not fit the equation of any of
+the above regressions. For example, the categorical data is does not fit in the
+equation as variable, but we still need to deal with it. For this kind of
+situations we create ***dummy variables***. (See Dealing with categorical data)
+
+## Dummy variable trap
+
+Not all the dummy variables should be included in the model. You can't have the
+constant 'b' and all the dummy variables in the same equation. When building
+the model, ***ALWAYS OMIT ONE DUMMY VARIABLE***. This is independent of how
+many dummy variables you have.
 
 ---
 
@@ -235,7 +260,7 @@ sklearn package.
 x[:, 1:3] = imputer.transform(x[:, 1:3])
 ```
 
-### Dealing with categorical data
+### Dealing with categorical data (dummy variables)
 
 4. If we have categorical data in our dataset, we need to encode this
    information. By default, python would not understand any array of characters
@@ -269,7 +294,8 @@ ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(), [0])] ,
 ```
 
 To transform and apply the canges all at the same time, we use the method
-`fit_transform()` from the `ColumnTransformer` class. We transform the array of X.
+`fit_transform()` from the `ColumnTransformer` class. We transform the array of
+X.
 
 
 x = np.array(ct.fit_transform(x))
@@ -313,3 +339,69 @@ The `train_test_split()` expects the following arguments:
   factors between the trainig set and test set we pass a `random_state`.
 
 ---
+
+# Statistical significance
+
+Statistical significance refers to the claim that a result from data generated
+by testing or experimentation is not likely to occur randomly or by chance but
+is instead likely to be attributable to a specific cause.
+
+[Statistical significance](https://www.investopedia.com/terms/s/statistical-significance.asp) 
+
+## Understanding the P-value and more statistical concepts
+
+- We use the ***p-value*** to determine whether we should reject o fail to
+  reject the null hypothesis.
+- The ***alpha value (α)*** is the probability of rejecting a null hypothesis
+  that is true.
+- The ***confidence level*** is how sure we are the confidence interval
+  contains the true the population parameter value. This confidence level
+  equals 1-α.
+
+---
+
+# Building a model (step by step)
+
+## 5 methods of building models
+
+1. **All-in:** Take in consideration all the variables from a given dataset.
+    * Prior knowledge that all the variables will help to predict something
+    * You have to use this method
+    * Preparing for backward elimination
+
+2. **Backward elimination:**
+    1. Select a significance level to stay in the model (e.g. SL = 0.05)
+    2. Fit the full mode with all possible predictors
+    3. Consider the predictor with the **highest** P-value. If P > SL,
+    go to STEP 4, otherwise go to FIN.
+    4. Remove the predictor
+    5. Fit the model without this variable. Go back to step 3 and
+    repeat until you got to FIN and the model is ready.
+
+3. **Forward selection:**
+    1. Select a significance leve to stay in the model (e.g. SL =
+    0.05).
+    2. Fit all simple regression modes **y ~ xn**. Select the one with
+    the lowest P-value.
+    3. Keep this variable and fit all the possible models with one
+    extra predictor added to the one(s) you already have.
+    4. Consider the predictor with the **lowest** P-value. If P < SL,
+    go to STEP 3, otherwise go to FIN. Go back to step 3 and repeat until you
+    got to FIN (FIN: keep the previous model)
+
+4. **Bidirection elimination**:
+    1. Select a significance level to enter and to stay in the model.
+    E.g: SLENTER = 0.05, SLSTAY = 0.05
+    2. Perform the next step forward selection (new variables mus have:
+    P < SLENTER to enter)
+    3. Perform ALL the steps of Backward elimination (old variables
+    must have P < SLTAY to stay). Go to step 2 and repeat. FIN: model is ready.
+
+5. **All possible models**:
+    1. Select a criterion of goodness of fit
+    2. Construct all possible regression modes: 2^n-1 total combinations
+    3. Select the one with the best criterion. FIN: your model is ready
+
+---
+
+
